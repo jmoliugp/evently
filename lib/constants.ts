@@ -30,3 +30,7 @@ export const eventDefaultValues = {
   isFree: false,
   url: "",
 };
+
+export const assets = {
+  logo: "/assets/images/logo.svg",
+};
