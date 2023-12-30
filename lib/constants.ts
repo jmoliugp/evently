@@ -1,6 +1,7 @@
 export enum Routes {
   Root = "/",
   SignIn = "/sign-in",
+  Events = "#events",
 }
 
 export const headerLinks = [
@@ -32,5 +33,6 @@ export const eventDefaultValues = {
 };
 
 export const assets = {
+  hero: "/assets/images/hero.png",
   logo: "/assets/images/logo.svg",
 };
