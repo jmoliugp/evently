@@ -4,6 +4,7 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
 import { clerkClient } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { UserSchema } from "@/lib/database/models/user.model";
 
 enum UserEventType {
   Created = "user.created",
@@ -65,10 +66,12 @@ export async function POST(req: Request) {
     const { id, email_addresses, image_url, first_name, last_name, username } =
       evt.data;
 
-    const user = {
+    const defaultUserName = `${first_name}#${new Date().getTime()}`;
+
+    const user: UserSchema = {
       clerkId: id,
       email: email_addresses[0].email_address,
-      username: username!,
+      userName: username || defaultUserName,
       firstName: first_name,
       lastName: last_name,
       photo: image_url,
