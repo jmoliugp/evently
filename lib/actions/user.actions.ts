@@ -2,14 +2,14 @@
 
 import { connectToDatabase } from "@/lib/database";
 import { CreateUserParams, UpdateUserParams } from "@/types";
-import { User } from "@/lib/database/models/user.model";
+import { User, UserSchema } from "@/lib/database/models/user.model";
 import { Event } from "@/lib/database/models/event.model";
 import { handleError } from "@/lib/utils/handleError";
 import { Order } from "@/lib/database/models/order.model";
 
 import { revalidatePath } from "next/cache";
 
-export async function createUser(user: CreateUserParams) {
+export async function createUser(user: UserSchema) {
   try {
     await connectToDatabase();
 
