@@ -11,5 +11,6 @@ export type InferBaseSchemaType<T> = Omit<
 export enum ModelKey {
   Category = "Category",
   Event = "Event",
+  Order = "Order",
   User = "User",
 }

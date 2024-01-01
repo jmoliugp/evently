@@ -18,8 +18,6 @@ const schema = new Schema({
   url: { type: String },
   category: { type: Schema.Types.ObjectId, ref: ModelKey.Category },
   organizer: { type: Schema.Types.ObjectId, ref: ModelKey.User },
-
-  clerkId: { type: String, required: true, unique: true },
 });
 
 export type EventSchema = InferBaseSchemaType<typeof schema>;
