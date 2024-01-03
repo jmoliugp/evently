@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Dropdown } from "@/components/shared/Dropdown";
 
 import * as z from "zod";
 import { eventFormSchema } from "@/lib/validator";
@@ -51,6 +52,21 @@ const EventForm: React.FC<Props> = ({ type, userId }) => {
                     placeholder="Event title"
                     {...field}
                     className="input-field"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Dropdown
+                    onChangeHandler={field.onChange}
+                    value={field.value}
                   />
                 </FormControl>
                 <FormMessage />
