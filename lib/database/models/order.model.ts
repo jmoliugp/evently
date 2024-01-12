@@ -3,7 +3,7 @@ import {
   InferDocSchemaType,
   ModelKey,
 } from "@/lib/database/models/types";
-import { Schema, model, models, Document } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 export type OrderItem = {
   _id: string;

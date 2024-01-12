@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { assets } from "@/lib/constants";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   title: "Evently",
   description: "Evently is a platform for event management.",
   icons: {
-    icon: "/assets/images/logo.svg",
+    icon: assets.logo,
   },
 };
 

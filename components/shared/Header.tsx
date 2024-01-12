@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Routes } from "@/lib/constants";
+import { Routes, assets } from "@/lib/constants";
 import NavItems from "@/components/shared/NavItems";
 import MobileNav from "@/components/shared/MobileNav";
 
@@ -12,7 +12,7 @@ const Header = () => {
       <div className="wrapper flex flex-row items-center justify-between">
         <Link href={Routes.Root} className="w-36">
           <Image
-            src="/assets/images/logo.svg"
+            src={assets.logo}
             width={128}
             height={38}
             alt="Evently logo"
