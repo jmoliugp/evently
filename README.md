@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🌐 Full Stack Next.js 14 Events App
 
-## Getting Started
+## Overview 🔎
 
-First, run the development server:
+Welcome to the Full Stack Next.js 14 MERN Events App repository. This application employs the MERN stack (MongoDB, Express.js, React.js, Node.js) 🚀 integrated with Stripe for payment processing 💳, and uses TypeScript and Tailwind CSS. For authentication, we use Clerk 🔐, and for file management, we utilize `uploadthing`. Prisma is our ORM for efficient database interactions 💾.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features 🌟
+
+- Event creation and management 🎉.
+- User authentication and authorization with Clerk 🔑.
+- Secure payment processing with Stripe 💰.
+- Responsive design using Tailwind CSS 🎨.
+- Type-safe codebase with TypeScript ✅.
+- File management with Uploadthing 📁.
+
+## Prerequisites 📋
+
+Before you begin, ensure you have the following:
+
+- [Node.js](https://nodejs.org/en)
+- [Yarn](https://yarnpkg.com/) package manager 🧶
+- [MongoDB](https://www.mongodb.com/) 🍃
+- [Stripe](https://stripe.com/) Account 💳
+- [Clerk](https://clerk.com/) Account 👥
+- [Uploadthing](https://uploadthing.com/) Account 🗂️
+
+## Installation 💻
+
+To install the Full Stack Next.js 14 MERN Events App, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone git@github.com:jmoliugp/evently.git
+   ```
+2. Install dependencies with Yarn:
+   ```
+   yarn install
+   ```
+
+## Setting Up Your Environment 🛠️
+
+Create a `.env` file in the root directory with the following contents:
+
+```env
+# Clerk
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="MY_CLERK_PUBLIC_KEY"
+CLERK_SECRET_KEY="MY_CLERK_SECRET_KEY"
+
+# DB
+DATABASE_URL=MY_MONGODB_URL
+
+# UploadThing
+UPLOADTHING_SECRET=MY_UPLOADTHING_SECRET
+UPLOADTHING_APP_ID=MY_UPLOADTHING_ID
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Replace `MY_CLERK_PUBLIC_KEY`, `MY_CLERK_SECRET_KEY`, `MY_MONGODB_URL`, `MY_UPLOADTHING_SECRET`, and `MY_UPLOADTHING_ID` with your actual credentials.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Running the Application 🏃‍♂️
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+To run the application, use the following command:
 
-## Learn More
+```
+yarn dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+This will start the development server on `http://localhost:3000`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing 🤝
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Contributions are welcomed and greatly appreciated. To contribute:
 
-## Deploy on Vercel
+1. Fork the Project 🍴
+2. Create your Feature Branch (`git checkout -b feature/<feature>`)
+3. Commit your Changes (`git commit -m 'Add some <feature>'`)
+4. Push to the Branch (`git push origin feature/<feature>`)
+5. Open a Pull Request 📬
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License 📄
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Distributed under the MIT License. See `LICENSE` for more information.
