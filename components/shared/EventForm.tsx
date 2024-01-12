@@ -1,30 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { Dropdown } from "@/components/shared/Dropdown";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Dropdown } from "@/components/shared/Dropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import * as z from "zod";
-import { eventFormSchema } from "@/lib/validator";
-import { assets, eventDefaultValues } from "@/lib/constants";
-import { Textarea } from "@/components/ui/textarea";
 import { FileUploader } from "@/components/shared/FileUploader";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { createEvent } from "@/lib/actions/event.actions";
+import { assets, eventDefaultValues } from "@/lib/constants";
+import { useUploadThing } from "@/lib/uploadthing";
+import { eventFormSchema } from "@/lib/validator";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import * as z from "zod";
 
 interface Props {
   userId: string;
@@ -32,16 +34,43 @@ interface Props {
 }
 
 const EventForm: React.FC<Props> = ({ type, userId }) => {
-  const initialValues = eventDefaultValues;
   const [files, setFiles] = useState<File[]>([]);
+  const { startUpload } = useUploadThing("imageUploader");
+  const router = useRouter();
+  const initialValues = eventDefaultValues;
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues,
   });
 
-  function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    const eventData = values;
+
+    let uploadedImageUrl = values.imageUrl;
+    if (files.length > 0) {
+      const uploadedImages = await startUpload(files);
+
+      if (!uploadedImages?.length) return;
+      uploadedImageUrl = uploadedImages[0].url;
+    }
+
+    if (type === "Create") {
+      try {
+        const newEvent = await createEvent({
+          event: { ...values, imageUrl: uploadedImageUrl },
+          userId,
+          path: "/profile",
+        });
+
+        if (newEvent) {
+          form.reset();
+          router.push(`/events/${newEvent.id}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 
   return (
@@ -127,7 +156,7 @@ const EventForm: React.FC<Props> = ({ type, userId }) => {
                 <FormControl>
                   <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
                     <Image
-                      src="/assets/icons/location-grey.svg"
+                      src={assets.location}
                       alt="calendar"
                       width={24}
                       height={24}
@@ -212,6 +241,84 @@ const EventForm: React.FC<Props> = ({ type, userId }) => {
             }}
           />
         </div>
+        <div className="flex flex-col gap-5 md:flex-row">
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                    <Image
+                      src={assets.dollar}
+                      alt="dollar"
+                      width={24}
+                      height={24}
+                      className="filter-grey"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Price"
+                      {...field}
+                      className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="isFree"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <label
+                                htmlFor="isFree"
+                                className="whitespace-nowrap pr-3 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                Free Ticket
+                              </label>
+                              <Checkbox
+                                onCheckedChange={field.onChange}
+                                checked={field.value}
+                                id="isFree"
+                                className="mr-2 h-5 w-5 border-2 border-primary-500"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                    <Image
+                      src={assets.link}
+                      alt="link"
+                      width={24}
+                      height={24}
+                    />
+
+                    <Input
+                      placeholder="URL"
+                      {...field}
+                      className="input-field"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button
           type="submit"
@@ -219,7 +326,7 @@ const EventForm: React.FC<Props> = ({ type, userId }) => {
           disabled={form.formState.isSubmitting}
           className="button col-span-2 w-full"
         >
-          Submit
+          {form.formState.isSubmitting ? "Submitting..." : `${type} Event`}
         </Button>
       </form>
     </Form>
