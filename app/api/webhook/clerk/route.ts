@@ -4,7 +4,7 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
 import { clerkClient } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { UserSchema } from "@/lib/database/models/user.model";
+import { Prisma, User } from "@prisma/client";
 
 enum UserEventType {
   Created = "user.created",
@@ -17,9 +17,9 @@ export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
-    );
+    return new Response("Error occured -- missing webhook secret", {
+      status: 500,
+    });
   }
 
   // Get the headers
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 
     const defaultUserName = `${first_name}#${new Date().getTime()}`;
 
-    const user: UserSchema = {
+    const user: Prisma.UserCreateInput = {
       clerkId: id,
       email: email_addresses[0].email_address,
       userName: username || defaultUserName,
@@ -80,11 +80,18 @@ export async function POST(req: Request) {
     const newUser = await createUser(user);
 
     if (newUser) {
-      await clerkClient.users.updateUserMetadata(id, {
-        publicMetadata: {
-          userId: newUser._id,
-        },
-      });
+      try {
+        await clerkClient.users.updateUserMetadata(id, {
+          publicMetadata: {
+            userId: newUser.id,
+          },
+        });
+      } catch (error) {
+        console.error("Error updating user metadata:", error);
+        return new Response("Error occured", {
+          status: 400,
+        });
+      }
     }
 
     return NextResponse.json({ message: "OK", user: newUser });

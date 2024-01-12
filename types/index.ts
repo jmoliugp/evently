@@ -100,7 +100,7 @@ export type Event = {
 
 // ====== CATEGORY PARAMS
 export type CreateCategoryParams = {
-  categoryName: string;
+  name: string;
 };
 
 // ====== ORDER PARAMS
