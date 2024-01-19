@@ -2,8 +2,14 @@
 
 import { prisma } from "@/lib/database";
 import { handleError } from "@/lib/utils/handleError";
-import { CreateEventParams, Event } from "@/types";
+import {
+  CreateEventParams,
+  DeleteEventParams,
+  Event,
+  GetAllEventsParams,
+} from "@/types";
 import { Event as DbEvent } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export const createEvent = async ({
   event,
@@ -37,6 +43,39 @@ export const createEvent = async ({
   }
 };
 
+export async function getAllEvents({
+  query,
+  limit = 6,
+  page,
+  category,
+}: GetAllEventsParams) {
+  let events;
+  try {
+    events = await prisma.event.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: 0,
+      take: limit,
+      include: {
+        category: true,
+        organizer: true,
+        Order: true,
+        _count: true,
+      },
+    });
+  } catch (error) {
+    handleError(error);
+  }
+
+  if (!events) throw new Error("Events not found");
+
+  const totalPages = Math.ceil(events.length / limit);
+
+  return {
+    events,
+    totalPages,
+  };
+}
+
 export const getEvent = async (id: string): Promise<DbEvent> => {
   let event;
   try {
@@ -55,19 +94,8 @@ export const getEventWithDetails = async (eventId: string): Promise<Event> => {
     const eventWithDetails = await prisma.event.findUnique({
       where: { id: eventId },
       include: {
-        organizer: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        organizer: true,
+        category: true,
       },
     });
 
@@ -79,3 +107,12 @@ export const getEventWithDetails = async (eventId: string): Promise<Event> => {
     throw new Error("There was an error fetching the event");
   }
 };
+
+export async function deleteEvent({ eventId, path }: DeleteEventParams) {
+  try {
+    await prisma.event.delete({ where: { id: eventId } });
+    revalidatePath(path);
+  } catch (error) {
+    handleError(error);
+  }
+}
