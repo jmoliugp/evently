@@ -33,8 +33,11 @@ export const eventDefaultValues = {
 };
 
 export const assets = {
+  arrow: "/assets/icons/arrow.svg",
   calendar: "/assets/icons/calendar.svg",
+  delete: "/assets/icons/delete.svg",
   dollar: "/assets/icons/dollar.svg",
+  edit: "/assets/icons/edit.svg",
   hero: "/assets/images/hero.png",
   location: "/assets/icons/location-grey.svg",
   link: "/assets/icons/link.svg",
