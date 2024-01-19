@@ -107,7 +107,6 @@ export const getEventWithDetails = async (eventId: string): Promise<Event> => {
     throw new Error("There was an error fetching the event");
   }
 };
-
 export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   try {
     await prisma.event.delete({ where: { id: eventId } });
