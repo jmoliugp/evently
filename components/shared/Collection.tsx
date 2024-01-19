@@ -1,5 +1,5 @@
 import React from "react";
-import { Event } from "@prisma/client";
+import { Event } from "@/types";
 import { Card } from "@/components/shared/Card";
 import { Pagination } from "@/components/shared/Pagination";
 
