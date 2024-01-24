@@ -20,24 +20,30 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FileUploader } from "@/components/shared/FileUploader";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { createEvent } from "@/lib/actions/event.actions";
+import { createEvent, updateEvent } from "@/lib/actions/event.actions";
 import { assets, eventDefaultValues } from "@/lib/constants";
 import { useUploadThing } from "@/lib/uploadthing";
 import { eventFormSchema } from "@/lib/validator";
+import { CreateEventParams, Event } from "@/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
+import { getFormFields } from "@/components/shared/EventForm/getFormFields";
 
 interface Props {
+  event: Event;
   userId: string;
   type: "Create" | "Update";
 }
 
-const EventForm: React.FC<Props> = ({ type, userId }) => {
+const EventForm: React.FC<Props> = ({ event, type, userId }) => {
   const [files, setFiles] = useState<File[]>([]);
   const { startUpload } = useUploadThing("imageUploader");
   const router = useRouter();
-  const initialValues = eventDefaultValues;
+  const initialValues = getFormFields({
+    event,
+    type,
+  });
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -66,6 +72,28 @@ const EventForm: React.FC<Props> = ({ type, userId }) => {
         if (newEvent) {
           form.reset();
           router.push(`/events/${newEvent.id}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (type === "Update") {
+      if (!event) {
+        router.back();
+        return;
+      }
+
+      try {
+        const updatedEvent = await updateEvent({
+          userId,
+          event: { ...values, imageUrl: uploadedImageUrl, id: event.id },
+          path: `/events/${event.id}`,
+        });
+
+        if (updatedEvent) {
+          form.reset();
+          router.push(`/events/${updatedEvent.id}`);
         }
       } catch (error) {
         console.log(error);
