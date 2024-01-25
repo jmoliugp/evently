@@ -31,7 +31,7 @@ import * as z from "zod";
 import { getFormFields } from "@/components/shared/EventForm/getFormFields";
 
 interface Props {
-  event: Event;
+  event?: Event;
   userId: string;
   type: "Create" | "Update";
 }

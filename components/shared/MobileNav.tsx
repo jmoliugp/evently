@@ -1,15 +1,8 @@
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { assets } from "@/lib/constants";
 import Image from "next/image";
 import NavItems from "./NavItems";
-import { Separator } from "@/components/ui/separator";
-import { assets } from "@/lib/constants";
 
 const MobileNav = () => {
   return (
