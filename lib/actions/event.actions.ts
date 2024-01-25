@@ -7,6 +7,7 @@ import {
   DeleteEventParams,
   Event,
   GetAllEventsParams,
+  GetRelatedEventsByCategoryParams,
   UpdateEventParams,
 } from "@/types";
 import { Event as DbEvent } from "@prisma/client";
@@ -115,6 +116,59 @@ export const getEventWithDetails = async (eventId: string): Promise<Event> => {
     throw new Error("There was an error fetching the event");
   }
 };
+
+export async function getRelatedEvents({
+  event,
+  limit = 3,
+  page = 1,
+}: GetRelatedEventsByCategoryParams): Promise<{
+  data: Event[];
+  totalPages: number;
+}> {
+  try {
+    const skipAmount = (Number(page) - 1) * limit;
+    const condition = {
+      AND: [
+        {
+          OR: [
+            { categoryId: event.category?.id },
+            { organizerId: event.organizer?.id },
+            { location: event.location },
+          ],
+        },
+        {
+          NOT: {
+            id: event.id,
+          },
+        },
+      ],
+    };
+
+    const [events, count] = await prisma.$transaction([
+      prisma.event.findMany({
+        where: condition,
+        include: {
+          category: true,
+          organizer: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: skipAmount,
+        take: limit,
+      }),
+      prisma.event.count({ where: condition }),
+    ]);
+
+    return {
+      data: events,
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
 export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   try {
     await prisma.event.delete({ where: { id: eventId } });
