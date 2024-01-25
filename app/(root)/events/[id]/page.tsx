@@ -1,4 +1,8 @@
-import { getEventWithDetails } from "@/lib/actions/event.actions";
+import { Collection } from "@/components/shared/Collection";
+import {
+  getEventWithDetails,
+  getRelatedEvents,
+} from "@/lib/actions/event.actions";
 import { assets } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils/formatDateTime";
 import { SearchParamProps } from "@/types";
@@ -10,6 +14,10 @@ const EventDetails: React.FC<SearchParamProps> = async ({
   searchParams,
 }) => {
   const event = await getEventWithDetails(params.id)!;
+  const relatedEvents = await getRelatedEvents({
+    event,
+    page: searchParams.page as string,
+  });
 
   return (
     <>
@@ -87,6 +95,20 @@ const EventDetails: React.FC<SearchParamProps> = async ({
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Events from the same organizer */}
+      <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
+        <h2 className="h2-bold">Related events</h2>
+        <Collection
+          data={relatedEvents?.data}
+          emptyTitle="No Events Found"
+          emptyStateSubtext="Come back later"
+          type="AllEvents"
+          limit={6}
+          page={1}
+          totalPages={2}
+        />
       </section>
     </>
   );
