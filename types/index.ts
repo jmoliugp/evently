@@ -20,15 +20,15 @@ export type CreateEventParams = {
   userId: string;
   event: {
     title: string;
-    description: string;
-    location: string;
+    description?: string;
+    location?: string;
     imageUrl: string;
     startDateTime: Date;
     endDateTime: Date;
-    categoryId: string;
-    price: string;
+    categoryId?: string;
+    price?: string;
     isFree: boolean;
-    url: string;
+    url?: string;
   };
   path: string;
 };
@@ -36,17 +36,17 @@ export type CreateEventParams = {
 export type UpdateEventParams = {
   userId: string;
   event: {
-    _id: string;
+    id: string;
     title: string;
     imageUrl: string;
-    description: string;
-    location: string;
+    description?: string;
+    location?: string;
     startDateTime: Date;
     endDateTime: Date;
-    categoryId: string;
-    price: string;
+    categoryId?: string;
+    price?: string;
     isFree: boolean;
-    url: string;
+    url?: string;
   };
   path: string;
 };
@@ -78,7 +78,7 @@ export type GetRelatedEventsByCategoryParams = {
 
 export type Event = {
   id: string;
-  title: string | null;
+  title: string;
   description: string | null;
   price: string | null;
   isFree: boolean;
@@ -91,6 +91,7 @@ export type Event = {
     id: string;
     firstName: string;
     lastName: string;
+    clerkId: string;
   } | null;
   category?: {
     id: string;

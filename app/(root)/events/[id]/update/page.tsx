@@ -1,9 +1,18 @@
 import EventForm from "@/components/shared/EventForm";
+import { getEventWithDetails } from "@/lib/actions/event.actions";
 import { auth } from "@clerk/nextjs";
 import React from "react";
 
-const UpdateEvent = () => {
+interface Props {
+  params: {
+    id: string;
+  };
+}
+
+const UpdateEvent: React.FC<Props> = async ({ params }) => {
   const { userId } = auth();
+
+  const event = await getEventWithDetails(params.id);
 
   return (
     <>
@@ -13,7 +22,7 @@ const UpdateEvent = () => {
         </h3>
       </section>
       <div className="warpper my-8">
-        <EventForm type="Create" userId={userId as string} />
+        <EventForm type="Update" userId={userId as string} event={event} />
       </div>
     </>
   );

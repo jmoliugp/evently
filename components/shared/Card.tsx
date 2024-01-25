@@ -14,12 +14,8 @@ interface Props {
 }
 
 export const Card: React.FC<Props> = ({ event, hasOrderLink, hidePrice }) => {
-  const { sessionClaims } = auth();
-  // FIXME: It is working but is not the expected format, might be related with how was the metadata configured within Clerk.
-  // @ts-ignore
-  const userId = sessionClaims?.userId?.userId as string;
-
-  const isEventCreator = userId === event.organizer?.id;
+  const { userId } = auth();
+  const isEventCreator = userId === event.organizer?.clerkId;
 
   return (
     <div className="group relative flex min-h-[380px] w-full max-w-[400px] flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg md:min-h-[438px]">

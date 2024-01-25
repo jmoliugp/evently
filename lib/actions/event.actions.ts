@@ -7,6 +7,7 @@ import {
   DeleteEventParams,
   Event,
   GetAllEventsParams,
+  UpdateEventParams,
 } from "@/types";
 import { Event as DbEvent } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -15,7 +16,7 @@ export const createEvent = async ({
   event,
   path,
   userId,
-}: CreateEventParams) => {
+}: CreateEventParams): Promise<Event> => {
   let organizer;
   try {
     organizer = await prisma.user.findUnique({
@@ -36,10 +37,17 @@ export const createEvent = async ({
         categoryId: event.categoryId,
         organizerId: organizer.id,
       },
+      include: {
+        category: true,
+        organizer: true,
+      },
     });
-    return newEvent;
+
+    return {
+      ...newEvent,
+    };
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 };
 
@@ -113,5 +121,49 @@ export async function deleteEvent({ eventId, path }: DeleteEventParams) {
     revalidatePath(path);
   } catch (error) {
     handleError(error);
+  }
+}
+
+export async function updateEvent({
+  userId,
+  event,
+  path,
+}: UpdateEventParams): Promise<Event> {
+  try {
+    const eventToUpdate = await prisma.event.findFirst({
+      where: { id: event.id },
+      include: {
+        organizer: true,
+      },
+    });
+
+    if (!eventToUpdate || eventToUpdate.organizer?.clerkId !== userId) {
+      throw new Error("Unauthorized or event not found");
+    }
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: event.id },
+      data: {
+        categoryId: event.categoryId,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        isFree: event.isFree,
+        location: event.location,
+        price: event.price,
+        endDateTime: event.endDateTime,
+        startDateTime: event.startDateTime,
+        title: event.title,
+        url: event.title,
+      },
+      include: {
+        category: true,
+        organizer: true,
+      },
+    });
+    revalidatePath(path);
+
+    return updatedEvent;
+  } catch (error) {
+    return handleError(error);
   }
 }
