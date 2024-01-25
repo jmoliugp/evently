@@ -7,11 +7,17 @@ import {
   DeleteEventParams,
   Event,
   GetAllEventsParams,
+  GetEventsByUserParams,
   GetRelatedEventsByCategoryParams,
   UpdateEventParams,
 } from "@/types";
 import { Event as DbEvent } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+
+interface EventsWithPagination {
+  data: Event[];
+  totalPages: number;
+}
 
 export const createEvent = async ({
   event,
@@ -98,6 +104,44 @@ export const getEvent = async (id: string): Promise<DbEvent> => {
   return event;
 };
 
+export async function getEventsByUser({
+  clerkId,
+  limit = 6,
+  page,
+}: GetEventsByUserParams): Promise<EventsWithPagination> {
+  try {
+    const skipAmount = (page - 1) * limit;
+    const condition = {
+      organizer: {
+        clerkId,
+      },
+    };
+
+    const [events, count] = await prisma.$transaction([
+      prisma.event.findMany({
+        where: condition,
+        include: {
+          category: true,
+          organizer: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: skipAmount,
+        take: limit,
+      }),
+      prisma.event.count({ where: condition }),
+    ]);
+
+    return {
+      data: events,
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
 export const getEventWithDetails = async (eventId: string): Promise<Event> => {
   try {
     const eventWithDetails = await prisma.event.findUnique({
@@ -121,10 +165,7 @@ export async function getRelatedEvents({
   event,
   limit = 3,
   page = 1,
-}: GetRelatedEventsByCategoryParams): Promise<{
-  data: Event[];
-  totalPages: number;
-}> {
+}: GetRelatedEventsByCategoryParams): Promise<EventsWithPagination> {
   try {
     const skipAmount = (Number(page) - 1) * limit;
     const condition = {
