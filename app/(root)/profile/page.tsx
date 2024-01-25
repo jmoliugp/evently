@@ -1,10 +1,21 @@
 import { Collection } from "@/components/shared/Collection";
 import { Button } from "@/components/ui/button";
+import { getEventsByUser } from "@/lib/actions/event.actions";
+import { SearchParamProps } from "@/types";
+import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
 
-const ProfilePage: React.FC = () => {
-  // TODO: Dummy data
+const ProfilePage: React.FC<SearchParamProps> = async ({ searchParams }) => {
+  const clerkProps = auth();
+  const eventsPage = Number(searchParams?.eventsPage) ?? 1;
+
+  const organizedEvents = await getEventsByUser({
+    clerkId: clerkProps.userId!,
+    page: 1,
+  });
+
+  // TODO: Replace dummy data on 'My Tickets' once the orders are being fetch.
   const orderedEvents = [] as any;
   const orderPage = 1;
   const orders = { totalPages: 1 };
@@ -28,7 +39,7 @@ const ProfilePage: React.FC = () => {
           emptyStateSubtext="No worries - plenty of exciting events to explore!"
           type="MyTickets"
           limit={3}
-          page={orderPage}
+          page={eventsPage}
           urlParamName="ordersPage"
           totalPages={orders.totalPages}
         ></Collection>
@@ -46,14 +57,14 @@ const ProfilePage: React.FC = () => {
 
       <section className="wrapper my-8">
         <Collection
-          data={orderedEvents}
+          data={organizedEvents.data}
           emptyTitle="No event have been created yet"
           emptyStateSubtext="Go create some now"
           type="EventsOrganized"
           limit={6}
           page={orderPage}
           urlParamName="eventsPage"
-          totalPages={orders.totalPages}
+          totalPages={organizedEvents?.totalPages}
         ></Collection>
       </section>
     </>
