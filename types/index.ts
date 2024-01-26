@@ -26,7 +26,7 @@ export type CreateEventParams = {
     startDateTime: Date;
     endDateTime: Date;
     categoryId?: string;
-    price?: string;
+    price: string;
     isFree: boolean;
     url?: string;
   };
@@ -44,7 +44,7 @@ export type UpdateEventParams = {
     startDateTime: Date;
     endDateTime: Date;
     categoryId?: string;
-    price?: string;
+    price: string;
     isFree: boolean;
     url?: string;
   };
@@ -78,24 +78,24 @@ export type GetRelatedEventsByCategoryParams = {
 export type Event = {
   id: string;
   title: string;
-  description: string | null;
-  price: string | null;
+  description?: string;
+  price: number;
   isFree: boolean;
   imageUrl: string;
-  location: string | null;
+  location?: string;
   startDateTime: Date;
   endDateTime: Date;
-  url: string | null;
-  organizer: {
+  url?: string;
+  organizer?: {
     id: string;
     firstName: string;
     lastName: string;
     clerkId: string;
-  } | null;
+  };
   category?: {
     id: string;
     name: string;
-  } | null;
+  };
 };
 
 // ====== CATEGORY PARAMS
@@ -107,7 +107,7 @@ export type CreateCategoryParams = {
 export type CheckoutOrderParams = {
   eventTitle: string;
   eventId: string;
-  price: string;
+  price: number;
   isFree: boolean;
   buyerId: string;
 };
@@ -117,7 +117,7 @@ export type CreateOrderParams = {
   eventId: string;
   buyerId: string;
   totalAmount: string;
-  createdAt: Date;
+  createdAt: Date; // Check on this.
 };
 
 export type GetOrdersByEventParams = {
