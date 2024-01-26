@@ -31,7 +31,7 @@ type DbPopulatedEvent = DbEvent & {
 };
 
 interface EventsWithPagination {
-  data: Event[] | null;
+  data: Event[];
   totalPages: number | null;
 }
 
