@@ -49,4 +49,67 @@ export async function getOrdersByEvent({
   }
 }
 
+// FIXME: Failing on redirect
 // Mutations
+
+export const createOrder = async (orderParams: CreateOrderParams) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+  try {
+    const order = await prisma.order.create({
+      data: {
+        stripeId: orderParams.stripeId,
+        buyerId: orderParams.buyerId,
+        eventId: orderParams.eventId,
+        totalAmount: orderParams.totalAmount,
+      },
+    });
+
+    return order;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const checkoutOrder = async (order: CheckoutOrderParams) => {
+  console.log("🚀 ~ checkoutOrder 1");
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  console.log("🚀 ~ checkoutOrder 2");
+
+  const price = order.isFree ? 0 : Number(order.price) * 100;
+
+  console.log("🚀 ~ checkoutOrder 3");
+  try {
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            unit_amount: price,
+            product_data: {
+              name: order.eventTitle,
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        eventId: order.eventId,
+        buyerId: order.buyerId,
+      },
+      mode: "payment",
+      success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
+    });
+    console.log(
+      "🚀 ~ checkoutOrder `${process.env.NEXT_PUBLIC_SERVER_URL}/`: ",
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/`
+    );
+    console.log("🚀 ~ checkoutOrder session.url: ", session.url);
+    console.log("🚀 ~ checkoutOrder session.url: ", session.url);
+
+    redirect(session.url!);
+  } catch (error) {
+    console.log("🚀 ~ checkoutOrder error: ", JSON.stringify(error));
+  }
+};
