@@ -7,7 +7,6 @@ import {
   CreateOrderParams,
   GetOrdersByEventParams,
 } from "@/types";
-import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
 // Queries
@@ -49,7 +48,6 @@ export async function getOrdersByEvent({
   }
 }
 
-// FIXME: Failing on redirect
 // Mutations
 
 export const createOrder = async (orderParams: CreateOrderParams) => {
@@ -72,13 +70,10 @@ export const createOrder = async (orderParams: CreateOrderParams) => {
 };
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
-  console.log("🚀 ~ checkoutOrder 1");
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-  console.log("🚀 ~ checkoutOrder 2");
 
   const price = order.isFree ? 0 : Number(order.price) * 100;
 
-  console.log("🚀 ~ checkoutOrder 3");
   try {
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -101,15 +96,9 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
       cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     });
-    console.log(
-      "🚀 ~ checkoutOrder `${process.env.NEXT_PUBLIC_SERVER_URL}/`: ",
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/`
-    );
-    console.log("🚀 ~ checkoutOrder session.url: ", session.url);
-    console.log("🚀 ~ checkoutOrder session.url: ", session.url);
 
-    redirect(session.url!);
+    return session.url;
   } catch (error) {
-    console.log("🚀 ~ checkoutOrder error: ", JSON.stringify(error));
+    handleError(error);
   }
 };

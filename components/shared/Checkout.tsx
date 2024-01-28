@@ -5,6 +5,7 @@ import { checkoutOrder } from "@/lib/actions/order.actions";
 import { Event } from "@/types";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface Props {
   event: Event;
@@ -14,6 +15,8 @@ interface Props {
 loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export const Checkout: React.FC<Props> = ({ event, userId }) => {
+  const router = useRouter();
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (query.get("success")) {
@@ -36,7 +39,10 @@ export const Checkout: React.FC<Props> = ({ event, userId }) => {
       buyerId: userId,
     };
 
-    await checkoutOrder(order);
+    const stripeCheckoutUrl = await checkoutOrder(order);
+    if (stripeCheckoutUrl == null) return;
+
+    router.push(stripeCheckoutUrl);
   };
 
   return (
