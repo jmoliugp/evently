@@ -7,5 +7,6 @@ interface Props {
 }
 
 export const Pagination: React.FC<Props> = () => {
-  return <div>Pagination</div>;
+  return null;
+  // return <div>Pagination</div>;
 };

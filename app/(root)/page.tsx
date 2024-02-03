@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default async function Home() {
-  const { events } = await getAllEvents({
+  const { data } = await getAllEvents({
     query: "",
     category: "",
     page: 1,
@@ -53,7 +53,7 @@ export default async function Home() {
           Search Category filter
         </div>
         <Collection
-          data={events}
+          data={data}
           emptyTitle="No Events Found"
           emptyStateSubtext="Come back later"
           type="AllEvents"

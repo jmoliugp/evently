@@ -64,7 +64,7 @@ const ProfilePage: React.FC<SearchParamProps> = async ({ searchParams }) => {
           limit={6}
           page={orderPage}
           urlParamName="eventsPage"
-          totalPages={organizedEvents?.totalPages}
+          totalPages={organizedEvents?.totalPages ?? 1}
         ></Collection>
       </section>
     </>

@@ -14,6 +14,22 @@ import {
 import { Event as DbEvent } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+type DbPopulatedEvent = DbEvent & {
+  category: {
+    id: string;
+    name: string;
+  } | null;
+  organizer: {
+    id: string;
+    clerkId: string;
+    email: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    photo: string;
+  } | null;
+};
+
 interface EventsWithPagination {
   data: Event[];
   totalPages: number;
@@ -38,11 +54,20 @@ export const createEvent = async ({
   }
 
   try {
-    const newEvent = await prisma.event.create({
+    const newEvent: DbPopulatedEvent = await prisma.event.create({
       data: {
-        ...event,
-        categoryId: event.categoryId,
         organizerId: organizer.id,
+
+        categoryId: event.categoryId,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        isFree: event.isFree,
+        location: event.location,
+        price: Number(event.price),
+        endDateTime: event.endDateTime,
+        startDateTime: event.startDateTime,
+        title: event.title,
+        url: event.url,
       },
       include: {
         category: true,
@@ -50,9 +75,7 @@ export const createEvent = async ({
       },
     });
 
-    return {
-      ...newEvent,
-    };
+    return parseEvent(newEvent);
   } catch (error) {
     return handleError(error);
   }
@@ -63,7 +86,7 @@ export async function getAllEvents({
   limit = 6,
   page,
   category,
-}: GetAllEventsParams) {
+}: GetAllEventsParams): Promise<EventsWithPagination> {
   let events;
   try {
     events = await prisma.event.findMany({
@@ -86,7 +109,7 @@ export async function getAllEvents({
   const totalPages = Math.ceil(events.length / limit);
 
   return {
-    events,
+    data: events.map((event) => parseEvent(event)),
     totalPages,
   };
 }
@@ -134,7 +157,7 @@ export async function getEventsByUser({
     ]);
 
     return {
-      data: events,
+      data: events.map((event) => parseEvent(event)),
       totalPages: Math.ceil(count / limit),
     };
   } catch (error) {
@@ -154,7 +177,7 @@ export const getEventWithDetails = async (eventId: string): Promise<Event> => {
 
     if (eventWithDetails == null) throw new Error("Event not found");
 
-    return eventWithDetails;
+    return parseEvent(eventWithDetails);
   } catch (error) {
     handleError(error);
     throw new Error("There was an error fetching the event");
@@ -202,7 +225,7 @@ export async function getRelatedEvents({
     ]);
 
     return {
-      data: events,
+      data: events.map((event) => parseEvent(event)),
       totalPages: Math.ceil(count / limit),
     };
   } catch (error) {
@@ -244,7 +267,7 @@ export async function updateEvent({
         imageUrl: event.imageUrl,
         isFree: event.isFree,
         location: event.location,
-        price: event.price,
+        price: Number(event.price),
         endDateTime: event.endDateTime,
         startDateTime: event.startDateTime,
         title: event.title,
@@ -257,8 +280,25 @@ export async function updateEvent({
     });
     revalidatePath(path);
 
-    return updatedEvent;
+    return parseEvent(updatedEvent);
   } catch (error) {
     return handleError(error);
   }
+}
+
+function parseEvent(dbEvent: DbPopulatedEvent): Event {
+  return {
+    endDateTime: dbEvent.endDateTime,
+    id: dbEvent.id,
+    imageUrl: dbEvent.imageUrl,
+    isFree: dbEvent.isFree,
+    startDateTime: dbEvent.startDateTime,
+    title: dbEvent.title,
+    category: dbEvent.category ?? undefined,
+    description: dbEvent.description ?? undefined,
+    location: dbEvent.location ?? undefined,
+    organizer: dbEvent.organizer ?? undefined,
+    price: dbEvent.price ?? undefined,
+    url: dbEvent.url ?? undefined,
+  };
 }

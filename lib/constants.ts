@@ -26,7 +26,7 @@ export const eventDefaultValues = {
   imageUrl: "",
   startDateTime: new Date(),
   endDateTime: new Date(),
-  price: "",
+  price: 0,
   isFree: false,
   url: "",
 };
