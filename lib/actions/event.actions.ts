@@ -86,7 +86,7 @@ export async function getAllEvents({
   limit = 6,
   page,
   category,
-}: GetAllEventsParams) {
+}: GetAllEventsParams): Promise<{ totalPages: number; events: Event[] }> {
   let events;
   try {
     events = await prisma.event.findMany({
@@ -109,7 +109,7 @@ export async function getAllEvents({
   const totalPages = Math.ceil(events.length / limit);
 
   return {
-    events,
+    events: events.map((event) => parseEvent(event)),
     totalPages,
   };
 }
