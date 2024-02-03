@@ -32,7 +32,7 @@ type DbPopulatedEvent = DbEvent & {
 
 interface EventsWithPagination {
   data: Event[];
-  totalPages: number | null;
+  totalPages: number;
 }
 
 export const createEvent = async ({
@@ -86,7 +86,7 @@ export async function getAllEvents({
   limit = 6,
   page,
   category,
-}: GetAllEventsParams): Promise<{ totalPages: number; events: Event[] }> {
+}: GetAllEventsParams): Promise<EventsWithPagination> {
   let events;
   try {
     events = await prisma.event.findMany({
@@ -109,7 +109,7 @@ export async function getAllEvents({
   const totalPages = Math.ceil(events.length / limit);
 
   return {
-    events: events.map((event) => parseEvent(event)),
+    data: events.map((event) => parseEvent(event)),
     totalPages,
   };
 }
