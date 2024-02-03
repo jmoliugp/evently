@@ -25,7 +25,7 @@ export const Checkout: React.FC<Props> = ({ event, userId }) => {
 
     if (query.get("canceled")) {
       console.log(
-        "Order canceled -- continue to shop around and checkout when you’re ready."
+        "Order canceled -- continue to shop around and checkout when you're ready."
       );
     }
   }, []);
