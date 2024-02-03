@@ -21,15 +21,15 @@ export const CheckoutButton: React.FC<Props> = ({ event }) => {
     return null;
   }
 
-  if (hasEventFinished) {
-    return (
-      <div className="flex items-center gap-3">
-        <p className="p-2 text-red-400">
-          Sorry, tickets are no longer available
-        </p>
-      </div>
-    );
-  }
+  // if (hasEventFinished) {
+  //   return (
+  //     <div className="flex items-center gap-3">
+  //       <p className="p-2 text-red-400">
+  //         Sorry, tickets are no longer available
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex items-center gap-3">
