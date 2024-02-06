@@ -6,7 +6,11 @@ import {
   CheckoutOrderParams,
   CreateOrderParams,
   GetOrdersByEventParams,
+  GetOrdersByUserParams,
+  Order,
+  WithPagination,
 } from "@/types";
+
 import Stripe from "stripe";
 
 // Queries
@@ -45,6 +49,73 @@ export async function getOrdersByEvent({
     return orders;
   } catch (error) {
     handleError(error);
+  }
+}
+
+export async function getOrdersByUser({
+  clerkId,
+  limit = 3,
+  page = 1,
+}: GetOrdersByUserParams): Promise<WithPagination<Order>> {
+  try {
+    const skipAmount = (Number(page) - 1) * limit;
+    const condition = {
+      buyer: {
+        clerkId,
+      },
+    };
+
+    const rawOrders = await prisma.order.findMany({
+      where: condition,
+      skip: skipAmount,
+      take: limit,
+      include: {
+        buyer: true,
+        event: {
+          include: {
+            organizer: true,
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    const count = await prisma.order.count({ where: condition });
+
+    const orders = rawOrders.map<Order>((order) => ({
+      buyer: order.buyer!,
+      buyerId: order.buyerId,
+      createdAt: order.createdAt,
+      event: {
+        endDateTime: order.event.endDateTime,
+        id: order.event.id,
+        imageUrl: order.event.imageUrl,
+        isFree: order.event.isFree,
+        price: order.event.price,
+        startDateTime: order.event.startDateTime,
+        title: order.event.title,
+        category:
+          order.event.category !== null
+            ? {
+                id: order.event.category.id,
+                name: order.event.category.name,
+              }
+            : undefined,
+      },
+      eventId: order.event?.id ?? undefined,
+      id: order.id,
+      stripeId: order.stripeId,
+      totalAmount: order.totalAmount,
+    }));
+
+    return {
+      data: orders,
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    return handleError(error);
   }
 }
 
