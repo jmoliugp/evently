@@ -6,6 +6,7 @@ import {
   CreateEventParams,
   DeleteEventParams,
   Event,
+  EventsWithPagination,
   GetAllEventsParams,
   GetEventsByUserParams,
   GetRelatedEventsByCategoryParams,
@@ -29,11 +30,6 @@ type DbPopulatedEvent = DbEvent & {
     photo: string;
   } | null;
 };
-
-interface EventsWithPagination {
-  data: Event[];
-  totalPages: number;
-}
 
 export const createEvent = async ({
   event,
