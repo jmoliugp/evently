@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string;
@@ -98,6 +100,16 @@ export type Event = {
   };
 };
 
+export type EventsWithPagination = {
+  data: Event[];
+  totalPages: number;
+};
+
+export type WithPagination<T> = {
+  data: T[];
+  totalPages: number;
+};
+
 // ====== CATEGORY PARAMS
 export type CreateCategoryParams = {
   name: string;
@@ -126,9 +138,20 @@ export type GetOrdersByEventParams = {
 };
 
 export type GetOrdersByUserParams = {
-  userId: string | null;
+  clerkId: string;
   limit?: number;
-  page: string | number | null;
+  page?: number;
+};
+
+export type Order = {
+  id: string;
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string | null;
+  eventId: string | null;
+  buyerId: string | null;
+  event: Event;
+  buyer: User;
 };
 
 // ====== URL QUERY PARAMS

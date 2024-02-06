@@ -43,11 +43,11 @@ model Order {
   id          String   @id @default(cuid()) @map("_id")
   createdAt   DateTime @default(now())
   stripeId    String   @unique
-  totalAmount String?
-  event       Event?   @relation(fields: [eventId], references: [id])
-  eventId     String?
-  buyer       User?    @relation(fields: [buyerId], references: [id])
-  buyerId     String?
+  totalAmount String
+  event       Event    @relation(fields: [eventId], references: [id])
+  eventId     String
+  buyer       User     @relation(fields: [buyerId], references: [id])
+  buyerId     String
 }
 
 model Category {
