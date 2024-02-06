@@ -1,24 +1,31 @@
 import { Collection } from "@/components/shared/Collection";
 import { Button } from "@/components/ui/button";
 import { getEventsByUser } from "@/lib/actions/event.actions";
+import { getOrdersByUser } from "@/lib/actions/order.actions";
 import { SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
 
-const ProfilePage: React.FC<SearchParamProps> = async ({ searchParams }) => {
-  const clerkProps = auth();
-  const eventsPage = Number(searchParams?.eventsPage) ?? 1;
+const ProfilePage: React.FC<SearchParamProps> = async ({
+  searchParams,
+}: SearchParamProps) => {
+  const clerkId = auth().userId!;
+
+  const ordersPage = Number(searchParams?.ordersPage) || 1;
+  const eventsPage = Number(searchParams?.eventsPage) || 1;
 
   const organizedEvents = await getEventsByUser({
-    clerkId: clerkProps.userId!,
+    clerkId,
     page: 1,
   });
 
-  // TODO: Replace dummy data on 'My Tickets' once the orders are being fetch.
-  const orderedEvents = [] as any;
+  const { data: orders, totalPages: ordersPages } = await getOrdersByUser({
+    clerkId,
+    page: 1,
+  });
+  const orderedEvents = orders.map((order) => order.event);
   const orderPage = 1;
-  const orders = { totalPages: 1 };
 
   return (
     <>
@@ -39,9 +46,9 @@ const ProfilePage: React.FC<SearchParamProps> = async ({ searchParams }) => {
           emptyStateSubtext="No worries - plenty of exciting events to explore!"
           type="MyTickets"
           limit={3}
-          page={eventsPage}
+          page={ordersPage}
           urlParamName="ordersPage"
-          totalPages={orders.totalPages}
+          totalPages={ordersPages}
         ></Collection>
       </section>
 
@@ -62,9 +69,9 @@ const ProfilePage: React.FC<SearchParamProps> = async ({ searchParams }) => {
           emptyStateSubtext="Go create some now"
           type="EventsOrganized"
           limit={6}
-          page={orderPage}
+          page={eventsPage}
           urlParamName="eventsPage"
-          totalPages={organizedEvents?.totalPages ?? 1}
+          totalPages={organizedEvents?.totalPages}
         ></Collection>
       </section>
     </>
