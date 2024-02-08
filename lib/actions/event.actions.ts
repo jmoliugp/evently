@@ -84,30 +84,32 @@ export async function getAllEvents({
   category,
 }: GetAllEventsParams): Promise<EventsWithPagination> {
   let events;
+
   try {
-    events = await prisma.event.findMany({
-      orderBy: { createdAt: "desc" },
-      skip: 0,
-      take: limit,
-      include: {
-        category: true,
-        organizer: true,
-        Order: true,
-        _count: true,
-      },
-    });
+    const [events, count] = await prisma.$transaction([
+      prisma.event.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: 0,
+        take: limit,
+        include: {
+          category: true,
+          organizer: true,
+          Order: true,
+          _count: true,
+        },
+      }),
+      prisma.event.count(),
+    ]);
+
+    if (!events) throw new Error("Events not found");
+
+    return {
+      data: events.map((event) => parseEvent(event)),
+      totalPages: Math.ceil(count / limit),
+    };
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
-
-  if (!events) throw new Error("Events not found");
-
-  const totalPages = Math.ceil(events.length / limit);
-
-  return {
-    data: events.map((event) => parseEvent(event)),
-    totalPages,
-  };
 }
 
 export const getEvent = async (id: string): Promise<DbEvent> => {
