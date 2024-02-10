@@ -44,3 +44,8 @@ export const assets = {
   menu: "/assets/icons/menu.svg",
   upload: "/assets/icons/upload.svg",
 };
+
+export enum ParamKey {
+  SearchText = "searchText",
+  Category = "category",
+}
