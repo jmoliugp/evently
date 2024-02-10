@@ -1,16 +1,31 @@
+import CategoryFilter from "@/components/shared/CategoryFilter";
 import { Collection } from "@/components/shared/Collection";
+import Search from "@/components/shared/Search";
 import { Button } from "@/components/ui/button";
 import { getAllEvents } from "@/lib/actions/event.actions";
 import { Routes, assets } from "@/lib/constants";
+import { SearchParamProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
-export default async function Home() {
+interface HomeSearchParams {
+  page?: string;
+  searchText?: string;
+  category?: string;
+}
+
+const Home: React.FC<SearchParamProps<HomeSearchParams>> = async ({
+  searchParams,
+}) => {
+  const page = Number(searchParams?.page) || 1;
+  const searchText = searchParams?.searchText || "";
+  const category = searchParams?.category || "";
+
   const { data } = await getAllEvents({
-    query: "",
-    category: "",
-    page: 1,
-    limit: 6,
+    searchText,
+    category,
+    page,
   });
 
   return (
@@ -50,7 +65,8 @@ export default async function Home() {
         </h2>
 
         <div className="flex w-full flex-col gap-5 md:flex-row">
-          Search Category filter
+          <Search />
+          <CategoryFilter />
         </div>
         <Collection
           data={data}
@@ -64,4 +80,6 @@ export default async function Home() {
       </section>
     </>
   );
-}
+};
+
+export default Home;
