@@ -12,7 +12,7 @@ import {
   GetRelatedEventsByCategoryParams,
   UpdateEventParams,
 } from "@/types";
-import { Event as DbEvent } from "@prisma/client";
+import { Event as DbEvent, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type DbPopulatedEvent = DbEvent & {
@@ -78,18 +78,37 @@ export const createEvent = async ({
 };
 
 export async function getAllEvents({
-  query,
+  searchText,
   limit = 6,
   page,
   category,
 }: GetAllEventsParams): Promise<EventsWithPagination> {
-  let events;
+  const condition: Prisma.EventWhereInput = {
+    ...(searchText && {
+      OR: [
+        {
+          title: {
+            contains: searchText,
+          },
+        },
+        {
+          description: {
+            contains: searchText,
+          },
+        },
+      ],
+    }),
+    ...(category && { category: { name: category } }),
+  };
+
+  const skip = (Number(page) - 1) * limit;
 
   try {
     const [events, count] = await prisma.$transaction([
       prisma.event.findMany({
+        where: condition,
         orderBy: { createdAt: "desc" },
-        skip: 0,
+        skip,
         take: limit,
         include: {
           category: true,
@@ -98,7 +117,7 @@ export async function getAllEvents({
           _count: true,
         },
       }),
-      prisma.event.count(),
+      prisma.event.count({ where: condition }),
     ]);
 
     if (!events) throw new Error("Events not found");
