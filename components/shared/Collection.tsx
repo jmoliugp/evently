@@ -52,7 +52,6 @@ export const Collection: React.FC<Props> = ({
           );
         })}
       </ul>
-
       {totalPages > 1 && (
         <Pagination
           urlParamName={urlParamName}
