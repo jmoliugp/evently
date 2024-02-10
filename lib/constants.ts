@@ -46,6 +46,7 @@ export const assets = {
 };
 
 export enum ParamKey {
-  SearchText = "searchText",
   Category = "category",
+  Page = "page",
+  SearchText = "searchText",
 }

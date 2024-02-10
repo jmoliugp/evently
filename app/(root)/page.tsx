@@ -22,7 +22,7 @@ const Home: React.FC<SearchParamProps<HomeSearchParams>> = async ({
   const searchText = searchParams?.searchText || "";
   const category = searchParams?.category || "";
 
-  const { data } = await getAllEvents({
+  const { data, totalPages } = await getAllEvents({
     searchText,
     category,
     page,
@@ -74,8 +74,8 @@ const Home: React.FC<SearchParamProps<HomeSearchParams>> = async ({
           emptyStateSubtext="Come back later"
           type="AllEvents"
           limit={6}
-          page={1}
-          totalPages={2}
+          page={page}
+          totalPages={totalPages}
         />
       </section>
     </>

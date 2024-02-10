@@ -15,9 +15,10 @@ const EventDetails: React.FC<SearchParamProps> = async ({
   searchParams,
 }) => {
   const event = await getEventWithDetails(params.id)!;
+  const page = Number(searchParams.page);
   const relatedEvents = await getRelatedEvents({
     event,
-    page: searchParams.page as string,
+    page,
   });
 
   return (
@@ -109,8 +110,8 @@ const EventDetails: React.FC<SearchParamProps> = async ({
           emptyStateSubtext="Come back later"
           type="AllEvents"
           limit={6}
-          page={1}
-          totalPages={2}
+          page={page}
+          totalPages={relatedEvents.totalPages}
         />
       </section>
     </>
