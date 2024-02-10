@@ -12,7 +12,7 @@ import {
   GetRelatedEventsByCategoryParams,
   UpdateEventParams,
 } from "@/types";
-import { Event as DbEvent } from "@prisma/client";
+import { Event as DbEvent, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type DbPopulatedEvent = DbEvent & {
@@ -78,36 +78,57 @@ export const createEvent = async ({
 };
 
 export async function getAllEvents({
-  query,
+  searchText,
   limit = 6,
   page,
   category,
 }: GetAllEventsParams): Promise<EventsWithPagination> {
-  let events;
-  try {
-    events = await prisma.event.findMany({
-      orderBy: { createdAt: "desc" },
-      skip: 0,
-      take: limit,
-      include: {
-        category: true,
-        organizer: true,
-        Order: true,
-        _count: true,
-      },
-    });
-  } catch (error) {
-    handleError(error);
-  }
-
-  if (!events) throw new Error("Events not found");
-
-  const totalPages = Math.ceil(events.length / limit);
-
-  return {
-    data: events.map((event) => parseEvent(event)),
-    totalPages,
+  const condition: Prisma.EventWhereInput = {
+    ...(searchText && {
+      OR: [
+        {
+          title: {
+            contains: searchText,
+          },
+        },
+        {
+          description: {
+            contains: searchText,
+          },
+        },
+      ],
+    }),
+    ...(category && { category: { name: category } }),
   };
+
+  const skip = (Number(page) - 1) * limit;
+
+  try {
+    const [events, count] = await prisma.$transaction([
+      prisma.event.findMany({
+        where: condition,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+        include: {
+          category: true,
+          organizer: true,
+          Order: true,
+          _count: true,
+        },
+      }),
+      prisma.event.count({ where: condition }),
+    ]);
+
+    if (!events) throw new Error("Events not found");
+
+    return {
+      data: events.map((event) => parseEvent(event)),
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    return handleError(error);
+  }
 }
 
 export const getEvent = async (id: string): Promise<DbEvent> => {

@@ -1,3 +1,4 @@
+import { ParamKey } from "@/lib/constants";
 import { User } from "@prisma/client";
 
 // ====== USER PARAMS
@@ -59,9 +60,9 @@ export type DeleteEventParams = {
 };
 
 export type GetAllEventsParams = {
-  query: string;
-  category: string;
-  limit: number;
+  searchText?: string;
+  category?: string;
+  limit?: number;
   page: number;
 };
 
@@ -157,7 +158,7 @@ export type Order = {
 // ====== URL QUERY PARAMS
 export type UrlQueryParams = {
   params: string;
-  key: string;
+  key: ParamKey;
   value: string | null;
 };
 
@@ -166,7 +167,9 @@ export type RemoveUrlQueryParams = {
   keysToRemove: string[];
 };
 
-export type SearchParamProps = {
+export type SearchParamProps<
+  SearchParams = { [key: string]: string | string[] | undefined }
+> = {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: SearchParams;
 };
