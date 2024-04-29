@@ -1,8 +1,8 @@
-# 🌐 Full Stack Next.js 14 Events App
+ # 🌐 Full Stack Next.js 14 Events App
 
 ## Overview 🔎
 
-Welcome to the Full Stack Next.js 14 MERN Events App repository. This application employs the MERN stack (MongoDB, Express.js, React.js, Node.js) 🚀 integrated with Stripe for payment processing 💳, and uses TypeScript and Tailwind CSS. For authentication, we use Clerk 🔐, and for file management, we utilize `uploadthing`. Prisma is our ORM for efficient database interactions 💾.
+Welcome to the Full Stack Next.js 14 Events App repository. This application is built using Next.js, leveraging server actions for efficient backend processing within the same framework used for the frontend. It utilizes MongoDB with Prisma as the ORM, allowing for seamless data handling and complex queries with ease. The app integrates Stripe for secure payment processing 💳 and uses TypeScript and Tailwind CSS for a type-safe, responsive design. Authentication is managed with Clerk 🔐, and file uploads are handled through uploadthing.
 
 ## Features 🌟
 
